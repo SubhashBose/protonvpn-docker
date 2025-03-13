@@ -1,3 +1,5 @@
+#docker build -t subhashbose/snid .
+
 FROM alpine:3.20.2
 
 WORKDIR /etc/openvpn/
