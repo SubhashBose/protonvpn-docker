@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/bin/bash
 
 #
 # Licensed under the EUPL-1.2 or later.
@@ -19,7 +19,7 @@
 : "${OPENVPN_TLS_CRYPT_FILE:=/etc/openvpn/ta.key}"
 
 : "${PROTON_API_URL:=https://api.protonvpn.ch}"
-: "${PROTON_TIER:=2}" #Proton Tier. 0=Free, 1=Basic, 2=Plus, 3=Visionary
+: "${PROTON_TIER:=0}" #Proton Tier. 0=Free, 1=Basic, 2=Plus, 3=Visionary
 : "${PROTON_SERVER_FILE:=/etc/openvpn/servers.json}"
 
 : "${VPN_KILL_SWITCH:=1}"     #Disconnect on VPN drop
@@ -31,6 +31,8 @@
 : "${HTTP_PROXY:=0}" #Start proxy server
 : "${RESOLVER_CONFIG:=/etc/resolv.conf}"
 : "${EXIT_ON_DISCONNECT:=0}"
+
+eval OPENVPN_EXTRA_ARGS="($OPENVPN_EXTRA_ARGS)"
 
 log() { echo "$(date "+%Y-%m-%d %H:%M:%S") $1"; }
 run_as_external() { su -s /bin/sh "$EXTERNAL_USER" -c "$1"; }
@@ -190,7 +192,7 @@ start_openvpn() {
     --config "$OPENVPN_CONFIG_FILE" \
     --auth-user-pass "$OPENVPN_USER_PASS_FILE" \
     --remote ${servers//$'\n'/' --remote '} \
-    $OPENVPN_EXTRA_ARGS &
+    "${OPENVPN_EXTRA_ARGS[@]}" &
 }
 
 main() {

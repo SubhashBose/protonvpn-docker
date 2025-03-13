@@ -8,7 +8,7 @@ HEALTHCHECK --start-period=1m --start-interval=1s --retries=1 \
 
 EXPOSE 3128/tcp
 
-RUN apk add --no-cache openvpn tinyproxy iptables jq
+RUN apk add --no-cache openvpn tinyproxy iptables jq bash
 
 COPY killswitch.rules /etc/iptables/
 COPY tinyproxy.conf /etc/tinyproxy/
