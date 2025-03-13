@@ -1,4 +1,4 @@
-#docker build -t subhashbose/snid .
+#docker build -t subhashbose/protonvpn .
 
 FROM alpine:3.20.2
 
