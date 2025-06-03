@@ -1,8 +1,8 @@
 name: Build and Push Docker Image
 
 on:
-  push:
-    branches: [ main ]  # or your default branch
+#  push:
+#    branches: [ main ]  # or your default branch
   workflow_dispatch:
 permissions:
     packages: write
@@ -32,7 +32,7 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
-        context: .
+        context: ./src
         push: true
         platforms: linux/amd64,linux/arm64
         tags: |
