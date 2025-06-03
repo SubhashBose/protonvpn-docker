@@ -25,6 +25,12 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_PAT }}
+
     - name: downcase REPO
       run: |
         echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
@@ -40,4 +46,8 @@ jobs:
             ghcr.io/${{ env.REPO }}:latest
             ghcr.io/${{ env.REPO }}:${{ env.timetag }}
             ghcr.io/${{ env.REPO }}:${{ github.sha }}
+            docker.io/${{ secrets.DOCKERHUB_USER }}/protonvpn:latest
+            docker.io/${{ secrets.DOCKERHUB_USER }}/protonvpn:${{ env.timetag }}
+            docker.io/${{ secrets.DOCKERHUB_USER }}/protonvpn:${{ github.sha }}
+
 
