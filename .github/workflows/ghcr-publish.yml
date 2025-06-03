@@ -28,6 +28,7 @@ jobs:
     - name: downcase REPO
       run: |
         echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+        echo "timetag=$(date '+%Y-%m-%dT%H%M%S')" >>${GITHUB_ENV}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
@@ -37,5 +38,6 @@ jobs:
         platforms: linux/amd64,linux/arm64
         tags: |
             ghcr.io/${{ env.REPO }}:latest
+            ghcr.io/${{ env.REPO }}:${{ env.timetag }}
             ghcr.io/${{ env.REPO }}:${{ github.sha }}
 
