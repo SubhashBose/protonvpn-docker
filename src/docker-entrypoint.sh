@@ -31,7 +31,7 @@
 : "${VPN_KILL_SWITCH:=1}"     #Disconnect on VPN drop
 : "${EXTERNAL_USER:=openvpn}" #User which bypasses VPN via split tunneling
 
-: "${IP_CHECK_URL:=https://ifconfig.co/json}" #URL to query for external IP
+: "${IP_CHECK_URL:=https://ifconfig.co/json}" #URL to query for external IP; put invalid value e.g., xx to skip checking
 : "${CONNECT_TIMEOUT:=60}"                    #Maximum time in seconds to wait for a new IP until a reconnect is triggered.
 
 : "${HTTP_PROXY:=0}" #Start proxy server
@@ -176,7 +176,7 @@ wait_for_new_ip() {
   local old_ip_json="$(run_as_external "$get_ip_cmd")"
   if [[ ! "$old_ip_json" ]]; then
     log >&2 "Failed to get old IP, skipping IP check."
-    return 1
+    return 0
   fi
 
   log "$(echo "$old_ip_json" | jq -r "\"Old $format_ip\"")"
