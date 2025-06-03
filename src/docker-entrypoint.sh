@@ -77,8 +77,8 @@ download_servers() {
   local filter=".LogicalServers | map(select(.Tier <= $PROTON_TIER and .Status == 1)) | sort_by(.Score)"
   IFS=$'\n' auth=(`./proton-auth --raw`)
   if [ $? -eq 0 ]; then
-    log "Got server list from API."
-    run_as_external "wget -q -O- --header "Authorization: Bearer ${auth[0]}" --header "x-pm-uid: ${auth[1]}" --header "x-pm-appversion: web-account@5.0.235.1" $PROTON_API_URL/vpn/logicals | jq \"$filter | $VPN_SERVER_FILTER\"" >"$PROTON_SERVER_FILE"
+    log "API Authorization Successful. Will fetch server list from API."
+    run_as_external "wget -q -O- --header \"Authorization: Bearer ${auth[0]}\" --header \"x-pm-uid: ${auth[1]}\" --header \"x-pm-appversion: web-account@5.0.235.1\" $PROTON_API_URL/vpn/logicals | jq \"$filter | $VPN_SERVER_FILTER\"" >"$PROTON_SERVER_FILE"
   else
     log "Failed to get servers from API. Will try to reuse existing server list."
     if [[ ! -s "$PROTON_SERVER_FILE" ]]; then
