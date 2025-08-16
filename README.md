@@ -1,5 +1,5 @@
 # ProtonVPN Docker Image
-This fork implements several improvements to and Proton API-based authentication.
+This fork implements several improvements and Proton API-based authentication (which is now mandatory to run).
 
 - Improved parsing of OpenVPN extra arguments passed through OPENVPN_EXTRA_ARGS env in Docker. In several cases, e.g, when argument contain quoted string with spaces, parsing fould fail previously
 - Implemented Proton API to authenticate and fetch the server list (old, unauthenticated fetch would fail otherwise)
