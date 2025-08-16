@@ -1,16 +1,20 @@
 # ProtonVPN Docker Image
 This fork implements several improvements and Proton API-based authentication (which is now mandatory to run).
 
-- Improved parsing of OpenVPN extra arguments passed through OPENVPN_EXTRA_ARGS env in Docker. In several cases, e.g, when argument contain quoted string with spaces, parsing fould fail previously
+- Improved parsing of OpenVPN extra arguments passed through OPENVPN_EXTRA_ARGS env in Docker. In several cases, e.g, when an argument contains a  quoted string with spaces, parsing would fail previously
 - Implemented Proton API to authenticate and fetch the server list (old, unauthenticated fetch would fail otherwise)
    - New env variables (`PROTON_USERNAME` and `PROTON_PASSWORD`) are required to be set to supply the Proton account username and password for API authentication.
 - Proton occasionally blocks API calls without a captcha. In that case, container scripts will re-use the last valid list of proton servers it obtained through API authentication.
-- In  case the API call is blocked/failed during the first run, or it never got a valid server list through API, then the container script will fetch a fallback list of proton servers (which I maintain and update manually on GitHub). Alternate backup list url can be provided with `PROTON_BACKUP_LOGICALS` env variable
+- In  case the API call is blocked/failed during the first run, or it never got a valid server list through the API, then the container script will fetch a fallback list of proton servers (which I maintain and update manually on GitHub). The alternate backup list URL can be provided with `PROTON_BACKUP_LOGICALS` env variable
 - These steps ensure the container never fails to start due to API fail/block. All these decision steps are logged during the container run.
 - Other minor changes
   - Now the default Proton tier is 'free'.
-  - Fixed error handling if OLD IP check failed (Previously script would terminate). Now script will log and disable IP checking.
+  - Fixed error handling if OLD IP check failed (Previously script would terminate). Now the script will log and disable IP checking.
   - To skip IP checking, any invalid value will work; a simple 'XX' would stop IP checking.
+
+## Docker image repositories
+1. Dcokerhub: `docker pull subhashbose/protonvpn` or with full url `docker pull docker.io/subhashbose/protonvpn`
+2. GitHub container repo: `docker pull ghcr.io/subhashbose/protonvpn-docker`
 
   
 ## Features
@@ -46,7 +50,7 @@ This fork implements several improvements and Proton API-based authentication (w
 ```yaml
 services:
   protonvpn:
-    image: genericmale/protonvpn
+    image: subhashbose/protonvpn
     restart: unless-stopped
     environment:
       - PROTON_USERNAME=login.username
@@ -91,7 +95,7 @@ This configuration achieves the following:
 ```yaml
 services:
   protonvpn:
-    image: genericmale/protonvpn
+    image: subhashbose/protonvpn
     restart: unless-stopped
     environment:
       - PROTON_USERNAME=login.username
