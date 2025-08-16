@@ -1,16 +1,18 @@
 # ProtonVPN Docker Image
+This fork implements several improvements to and Proton API-based authentication.
 
-[![GitHub License](https://img.shields.io/github/license/GenericMale/protonvpn-docker?logo=github)](https://github.com/GenericMale/protonvpn-docker/blob/main/LICENSE)
-[![GitHub Last Commit](https://img.shields.io/github/last-commit/genericmale/protonvpn-docker?label=commit&logo=github)](https://github.com/GenericMale/protonvpn-docker)
-[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/genericmale/protonvpn-docker/docker-publish.yml?label=build&logo=github)](https://github.com/GenericMale/protonvpn-docker/actions/workflows/docker-publish.yml)
-[![GitHub Tests](https://img.shields.io/endpoint?logo=github&url=https%3A%2F%2Fgist.githubusercontent.com%2FGenericMale%2Fd11c7cec7a928d0f605db3682ad2678c%2Fraw%2Ftest-badge.json)](https://github.com/GenericMale/protonvpn-docker/actions/workflows/tests.yml)
-[![Codacy Coverage](https://img.shields.io/codacy/coverage/476317284931429ca1c0c827da1ae846?logo=codacy)](https://app.codacy.com/gh/GenericMale/protonvpn-docker/coverage/dashboard)
-[![Codacy Grade](https://img.shields.io/codacy/grade/476317284931429ca1c0c827da1ae846?logo=codacy)](https://app.codacy.com/gh/GenericMale/protonvpn-docker/dashboard)
-[![Docker Image Version](https://img.shields.io/docker/v/genericmale/protonvpn?logo=docker&logoColor=white)](https://hub.docker.com/r/genericmale/protonvpn/tags)
-[![Docker Image Size](https://img.shields.io/docker/image-size/genericmale/protonvpn?label=size&logo=docker&logoColor=white)](https://hub.docker.com/r/genericmale/protonvpn/tags)
+- Improved parsing of OpenVPN extra arguments passed through OPENVPN_EXTRA_ARGS env in Docker. In several cases, e.g, when argument contain quoted string with spaces, parsing fould fail previously
+- Implemented Proton API to authenticate and fetch the server list (old, unauthenticated fetch would fail otherwise)
+   - New env variables (`PROTON_USERNAME` and `PROTON_PASSWORD`) are required to be set to supply the Proton account username and password for API authentication.
+- Proton occasionally blocks API calls without a captcha. In that case, container scripts will re-use the last valid list of proton servers it obtained through API authentication.
+- In  case the API call is blocked/failed during the first run, or it never got a valid server list through API, then the container script will fetch a fallback list of proton servers (which I maintain and update manually on GitHub). Alternate backup list url can be provided with `PROTON_BACKUP_LOGICALS` env variable
+- These steps ensure the container never fails to start due to API fail/block. All these decision steps are logged during the container run.
+- Other minor changes
+  - Now the default Proton tier is 'free'.
+  - Fixed error handling if OLD IP check failed (Previously script would terminate). Now script will log and disable IP checking.
+  - To skip IP checking, any invalid value will work; a simple 'XX' would stop IP checking.
 
-This Docker image provides a lightweight and secure solution to connect your containers to ProtonVPN.
-
+  
 ## Features
 
 - **Minimal Footprint:** Built on Alpine Linux for a compact image size.
@@ -47,7 +49,10 @@ services:
     image: genericmale/protonvpn
     restart: unless-stopped
     environment:
-      - OPENVPN_USER_PASS_FILE=/run/secrets/protonvpn
+      - PROTON_USERNAME=login.username
+      - PROTON_PASSWORD=login.password
+      - OPENVPN_USER=openvpn.user
+      - OPENVPN_PASS=openvpn.password
       - VPN_RECONNECT=2:00
       - VPN_SERVER_COUNT=10
     ports:
@@ -89,6 +94,8 @@ services:
     image: genericmale/protonvpn
     restart: unless-stopped
     environment:
+      - PROTON_USERNAME=login.username
+      - PROTON_PASSWORD=login.password
       - OPENVPN_USER_PASS_FILE=/run/secrets/protonvpn
       - HTTP_PROXY=1
     ports:
@@ -111,10 +118,12 @@ secrets:
 | Variable               | Default                     | Description                                                                                                                                  |
 |------------------------|-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
 | OPENVPN_USER_PASS_FILE | /etc/openvpn/protonvpn.auth | Path to a file containing your OpenVPN username and password on separate lines.                                                              |
-| OPENVPN_USER           | *(undefined)*               | Username for authentication. Will be used to create `OPENVPN_USER_PASS_FILE` if it doesn't exist.                                            |
-| OPENVPN_PASS           | *(undefined)*               | Password for authentication. Will be used to create `OPENVPN_USER_PASS_FILE` if it doesn't exist.                                            |
+| PROTON_USERNAME        | *(undefined)*               | Username for Proton account login.                                                                                                           |
+| PROTON_PASSWORD        | *(undefined)*               | Password for Proton account login.                                                                                                           |
+| OPENVPN_USER           | *(undefined)*               | Username for OpenVPN authentication. Will be used to create `OPENVPN_USER_PASS_FILE` if it doesn't exist.                                    |
+| OPENVPN_PASS           | *(undefined)*               | Password for OpenVPN authentication. Will be used to create `OPENVPN_USER_PASS_FILE` if it doesn't exist.                                    |
 | OPENVPN_EXTRA_ARGS     | *(undefined)*               | Additional arguments to pass to the OpenVPN command.                                                                                         |
-| PROTON_TIER            | 2                           | Your Proton Tier. Valid values: 0 (Free), 1 (Basic), 2 (Plus), 3 (Visionary)                                                                 |
+| PROTON_TIER            | 0                           | Your Proton Tier. Valid values: 0 (Free), 1 (Basic), 2 (Plus), 3 (Visionary)                                                                 |
 | IP_CHECK_URL           | <https://ifconfig.co/json>  | URL to check for a new IP address after connecting to the VPN. Unset to disable.                                                             |
 | CONNECT_TIMEOUT        | 60                          | Maximum time in seconds to wait for a new IP before a reconnect is triggered.                                                                |
 | VPN_SERVER_FILTER      | .                           | Optional JQ filter to apply to the server list returned by the API. By default, servers are ranked by their score (closest/fastest on top).  |
