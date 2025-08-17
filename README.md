@@ -13,6 +13,7 @@ This fork implements several improvements and Proton API-based authentication (w
   - To skip IP checking, any invalid value will work; a simple 'XX' would stop IP checking.
 
 ## Docker image repositories
+Docker images are published in the following repositories in `ARM64` and `AMD64` architectures.
 1. Dcokerhub: `docker pull subhashbose/protonvpn` or with full url `docker pull docker.io/subhashbose/protonvpn`
 2. GitHub container repo: `docker pull ghcr.io/subhashbose/protonvpn-docker`
 
