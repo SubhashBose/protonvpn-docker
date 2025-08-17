@@ -1,5 +1,5 @@
 # ProtonVPN Docker Image
-This fork implements several improvements and Proton API-based authentication (which is now mandatory to run).
+This is a working fork that implements several improvements and Proton API-based authentication (which is now mandatory to run).
 
 - Improved parsing of OpenVPN extra arguments passed through OPENVPN_EXTRA_ARGS env in Docker. In several cases, e.g, when an argument contains a  quoted string with spaces, parsing would fail previously
 - Implemented Proton API to authenticate and fetch the server list (old, unauthenticated fetch would fail otherwise)
@@ -9,7 +9,7 @@ This fork implements several improvements and Proton API-based authentication (w
 - These steps ensure the container never fails to start due to API fail/block. All these decision steps are logged during the container run.
 - Other minor changes
   - Now the default Proton tier is 'free'.
-  - Fixed error handling if OLD IP check failed (Previously script would terminate). Now the script will log and disable IP checking.
+  - Fixed error handling if OLD IP check failed (previously script would terminate). Now the script will log and disable IP checking.
   - To skip IP checking, any invalid value will work; a simple 'XX' would stop IP checking.
 
 ## Docker image repositories
